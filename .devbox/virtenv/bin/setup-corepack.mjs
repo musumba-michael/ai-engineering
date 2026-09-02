@@ -1,0 +1,1 @@
+/home/gerald/projects/ai-engineering/.devbox/virtenv/nodejs/bin/setup-corepack.mjs
