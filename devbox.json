@@ -3,7 +3,8 @@
   "packages": [
     "uv@latest",
     "turbo@latest",
-    "nodejs@latest"
+    "nodejs@latest",
+    "pnpm@latest"
   ],
   "shell": {
     "init_hook": [
