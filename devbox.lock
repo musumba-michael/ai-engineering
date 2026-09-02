@@ -1,6 +1,54 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "turbo@latest": {
+      "last_modified": "2026-08-27T07:16:00Z",
+      "resolved": "github:NixOS/nixpkgs/c27cdad491a991b11ed731760aa2ef8db0cb0410#turbo",
+      "source": "devbox-search",
+      "version": "2.9.18",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mihrn7019csygvg7zs5axp6n9njd7f8y-turbo-2.9.18",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mihrn7019csygvg7zs5axp6n9njd7f8y-turbo-2.9.18"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rmgn6klqkk8awa04hcq4bkj9a07cr2dz-turbo-2.9.18",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rmgn6klqkk8awa04hcq4bkj9a07cr2dz-turbo-2.9.18"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/dlwf6d64glmad79awakc92c6idyyrslw-turbo-2.9.18",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/dlwf6d64glmad79awakc92c6idyyrslw-turbo-2.9.18"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/y0raa6mpzm6pa4zyipxl96m0zzd9v8d6-turbo-2.9.18",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/y0raa6mpzm6pa4zyipxl96m0zzd9v8d6-turbo-2.9.18"
+        }
+      }
+    },
     "uv@latest": {
       "last_modified": "2026-08-27T07:16:00Z",
       "resolved": "github:NixOS/nixpkgs/c27cdad491a991b11ed731760aa2ef8db0cb0410#uv",
