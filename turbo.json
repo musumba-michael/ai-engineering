@@ -1,21 +1,29 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+    "$schema": "https://turborepo.dev/schema.json",
+    "ui": "tui",
+    "futureFlags": {
+        "experimentalPythonWorkspaces": true,
+        "experimentalTaskCommand": true
     },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "inputs": ["$TURBO_DEFAULT$", ".env*"],
+            "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "check-types": {
+            "dependsOn": ["^check-types"]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "ai-engineering#check": {
+            "command": ["uv", "lock", "--check"],
+            "inputs": ["pyproject.toml", "uv.lock", "apps/api/pyproject.toml"]
+        }
     }
-  }
 }

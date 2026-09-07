@@ -5,6 +5,20 @@ node_modules
 .pnp
 .pnp.js
 
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+
 # Local env files
 .env
 .env.local

@@ -1,0 +1,5 @@
+[tool.turbo]
+name = "ai-engineering"
+
+[tool.uv.workspace]
+members = ["apps/api"]
