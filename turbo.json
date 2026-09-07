@@ -7,23 +7,81 @@
     },
     "tasks": {
         "build": {
-            "dependsOn": ["^build"],
-            "inputs": ["$TURBO_DEFAULT$", ".env*"],
-            "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                ".env*"
+            ],
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**",
+                "!.next/dev/**"
+            ]
         },
         "lint": {
-            "dependsOn": ["^lint"]
+            "dependsOn": [
+                "^lint"
+            ]
         },
         "check-types": {
-            "dependsOn": ["^check-types"]
+            "dependsOn": [
+                "^check-types"
+            ]
         },
         "dev": {
             "cache": false,
             "persistent": true
         },
         "ai-engineering#check": {
-            "command": ["uv", "lock", "--check"],
-            "inputs": ["pyproject.toml", "uv.lock", "apps/api/pyproject.toml"]
+            "command": [
+                "uv",
+                "lock",
+                "--check"
+            ],
+            "inputs": [
+                "pyproject.toml",
+                "uv.lock",
+                "apps/api/pyproject.toml"
+            ]
+        },
+        "notebooks#dev": {
+            "command": [
+                "uv",
+                "run",
+                "--package",
+                "notebooks",
+                "jupyter",
+                "lab"
+            ],
+            "cache": false,
+            "persistent": true
+        },
+        "notebooks#studio": {
+            "command": [
+                "uv",
+                "run",
+                "--package",
+                "notebooks",
+                "langgraph",
+                "dev"
+            ],
+            "cache": false,
+            "persistent": true
+        },
+        "api#dev": {
+            "command": [
+                "uv",
+                "run",
+                "--package",
+                "api",
+                "python",
+                "manage.py",
+                "runserver"
+            ],
+            "cache": false,
+            "persistent": true
         }
     }
 }

@@ -1,159 +1,161 @@
-# Turborepo starter
+# ai-engineering
 
-This Turborepo starter is maintained by the Turborepo core team.
+A [Turborepo](https://turborepo.dev) monorepo combining TypeScript apps and Python
+packages in a single task graph. Node workspaces are managed by
+[pnpm](https://pnpm.io); Python workspaces by [uv](https://docs.astral.sh/uv/),
+wired into Turborepo through the `experimentalPythonWorkspaces` future flag.
 
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
+```
+ai-engineering/
+├── apps/
+│   ├── api/        Django REST service        (Python, uv)
+│   ├── web/        Next.js app  :3000         (TypeScript)
+│   └── docs/       Next.js app  :3001         (TypeScript)
+├── notebooks/      Jupyter + LangGraph        (Python, uv)
+├── packages/
+│   ├── ui/                 shared React components
+│   ├── eslint-config/      shared ESLint config
+│   └── typescript-config/  shared tsconfig
+├── devbox.json     toolchain (uv, node, pnpm, turbo)
+├── turbo.json      task graph
+├── pyproject.toml  uv workspace root
+└── uv.lock         single lockfile for all Python members
 ```
 
-## What's inside?
+## 1. Install Devbox
 
-This Turborepo includes the following packages/apps:
+Every tool this repo needs `uv`, `node`, `pnpm`, `turbo` is pinned in
+[devbox.json](devbox.json), so Devbox is the only thing you install by hand.
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Devbox is built on [Nix](https://nixos.org), which the install script sets up for
+you if it isn't present. On macOS and Linux:
 
 ```sh
-cd my-turborepo
-turbo build
+curl -fsSL https://get.jetify.com/devbox | bash
 ```
 
-Without global `turbo`, use your package manager:
+On Windows, install it inside [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install).
+
+Then enter the environment from the repo root:
 
 ```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
+devbox shell
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Your prompt gains a `(devbox)` prefix. The first run downloads the toolchain and
+takes a few minutes; later runs are instant. Leave with `exit`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+> Every command below assumes you are inside `devbox shell`.
+
+## 2. Install dependencies
 
 ```sh
-turbo build --filter=docs
+pnpm install     # Node workspaces
+uv sync          # Python workspaces (creates ./.venv)
 ```
 
-Without global `turbo`:
+## 3. Configure secrets
+
+One `.env` at the repo root serves the whole monorepo. Copy
+[.env.example](.env.example) and fill in your keys:
 
 ```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+cp .env.example .env
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Commands
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+We are using [Turborepo](https://turborepo.dev) as our task runner. Every task is defined
+in [turbo.json](turbo.json) and runs the same way whether it is TypeScript or
+Python work.
+
+### Examples
+
+| What you want | Command |
+| --- | --- |
+| JupyterLab (`:8888`) | `turbo run dev --filter=notebooks` |
+| LangGraph Studio (`:2024`) | `turbo run studio --filter=notebooks` |
+| Django dev server (`:8000`) | `turbo run dev --filter=api` |
+| Next.js web (`:3000`) | `turbo run dev --filter=web` |
+| Everything in dev at once | `turbo run dev` |
+| Lint (ruff + eslint) | `turbo run lint` |
+| Test | `turbo run test` |
+| Format | `turbo run format` |
+| Build | `turbo run build` |
+| Verify `uv.lock` is current | `turbo run check` |
+
+`turbo run dev` with no filter starts web on `:3000`, docs on `:3001`, Django on
+`:8000` and JupyterLab on `:8888` together.
+
+Re-resolving the Python lockfile is a plain uv command, not a turbo task:
 
 ```sh
-cd my-turborepo
-turbo dev
+uv lock
 ```
 
-Without global `turbo`, use your package manager:
+### What each turbo task expands to
+
+Python tasks are registered automatically by the `experimentalPythonWorkspaces`
+flag there are no `scripts` to declare, because uv has no task runner. Turbo
+detects the tools each member declares and maps them:
+
+| Task | Package | Runs |
+| --- | --- | --- |
+| `build` | `web`, `docs` | `next build` |
+| `lint` | `web`, `docs`, `@repo/ui` | `eslint` |
+| `lint` | `api` | `uv run --frozen --package api ruff check apps/api` |
+| `test` | `api` | `uv run --frozen --package api pytest apps/api` |
+| `format` | `api` | `ruff format` |
+| `format` | `notebooks` | `uv format -- notebooks` |
+| `check` | workspace root | `uv lock --check` |
+| `check-types` | `web`, `docs`, `@repo/ui` | `tsc --noEmit` |
+| `dev` | `notebooks` | `uv run --package notebooks jupyter lab` |
+| `dev` | `api` | `uv run --package api python manage.py runserver` |
+| `studio` | `notebooks` | `uv run --package notebooks langgraph dev` |
+
+Filter any task to one package with `--filter=<name>`, and pass arguments through
+to the underlying tool after `--`:
 
 ```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+turbo run lint --filter=api -- --fix
+turbo run test --filter=api -- -k smoke
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### Adding a command
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+`pyproject.toml` cannot hold script aliases uv has no task-runner equivalent of
+`package.json` scripts ([astral-sh/uv#5903](https://github.com/astral-sh/uv/issues/5903)),
+and `[project.scripts]` declares Python entry points, not shell commands. Define
+new commands in `turbo.json` instead, using `experimentalTaskCommand`:
 
-```sh
-turbo dev --filter=web
+```json
+"notebooks#studio": {
+  "command": ["uv", "run", "--package", "notebooks", "langgraph", "dev"],
+  "cache": false,
+  "persistent": true
+}
 ```
 
-Without global `turbo`:
+Package-scoped commands run with their package directory as the working
+directory.
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+---
 
-### Remote Caching
+## How the Python side fits together
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- The uv workspace root is [pyproject.toml](pyproject.toml); its members are
+  `apps/api` and `notebooks`.
+- All members share **one** [uv.lock](uv.lock), so every package resolves to the
+  same version of every dependency. There is no catalog to maintain when
+  `notebooks` and `api` both use LangChain, the lockfile guarantees they agree.
+- Both members set `package = false`: they are applications to run, not libraries
+  to publish, so nothing is built or installed for them.
+- Adding a member means creating its `pyproject.toml`, listing it under
+  `[tool.uv.workspace] members`, and running `uv lock`.
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Per-package docs
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- [apps/api/README.md](apps/api/README.md) -> Django service
+- [notebooks/README.md](notebooks/README.md) -> Jupyter and LangGraph Studio

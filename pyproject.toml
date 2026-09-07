@@ -2,4 +2,4 @@
 name = "ai-engineering"
 
 [tool.uv.workspace]
-members = ["apps/api"]
+members = ["apps/api", "notebooks"]
