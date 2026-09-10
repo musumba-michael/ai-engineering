@@ -1,7 +1,27 @@
 {
   "dockerfile_lines": [],
-  "graphs": {},
+  "graphs": {
+    "module_0_nodes": "./module-0/studio/nodes.py:graph",
+    "module_0_state": "./module-0/studio/state.py:graph",
+    "module_0_edges": "./module-0/studio/edges.py:graph",
+    "module_0_memory": "./module-0/studio/memory.py:graph",
+    "module_0_interrupts": "./module-0/studio/interrupts.py:graph",
+    "module_0_tools": "./module-0/studio/tools.py:graph",
+    "module_0_models": "./module-0/studio/models.py:graph",
+    "module_1_chain": "./module-1/studio/chain.py:graph",
+    "module_1_router": "./module-1/studio/router.py:graph",
+    "module_1_agent": "./module-1/studio/agent.py:graph",
+    "module_1_state_schema": "./module-1/studio/state_schema.py:graph",
+    "module_1_filter_messages": "./module-1/studio/filter_messages.py:graph",
+    "module_1_summarization": "./module-1/studio/summarization.py:graph",
+    "module_1_prompting": "./module-1/studio/prompting.py:graph",
+    "module_1_multimodal": "./module-1/studio/multimodal.py:graph",
+    "module_1_mcp": "./module-1/studio/mcp.py:make_graph",
+    "module_1_middleware": "./module-1/studio/middleware.py:graph"
+  },
   "env": "../.env",
   "python_version": "3.12",
-  "dependencies": ["."]
+  "dependencies": [
+    "."
+  ]
 }
