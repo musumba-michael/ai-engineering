@@ -30,7 +30,7 @@ async def make_graph(config=None):
     prompt = await client.get_prompt("local_server", "prompt")
 
     return create_agent(
-        model="gpt-5-nano",
+        model="groq:openai/gpt-oss-20b",
         tools=tools,
         system_prompt=prompt[0].content,
     )

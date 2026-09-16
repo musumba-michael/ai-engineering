@@ -1,10 +1,10 @@
 """06-trim-filter-messages.ipynb — drop all but the two most recent messages."""
 
 from langchain_core.messages import RemoveMessage
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.graph import END, START, MessagesState, StateGraph
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatGroq(model="openai/gpt-oss-20b")
 
 
 # Nodes

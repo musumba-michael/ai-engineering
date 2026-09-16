@@ -1,7 +1,7 @@
 """10-middleware.ipynb — web search + SQL agent, gated by human approval."""
 
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Awaitable, Callable, Dict
 
 from langchain.agents import AgentState, create_agent
 from langchain.agents.middleware import (
@@ -50,20 +50,22 @@ def log_after_agent(state: AgentState, runtime: Runtime) -> dict[str, Any] | Non
     return None
 
 
+# Studio runs graphs asynchronously, so wrap-style hooks must be async here.
+# (Node-style hooks like before_agent can stay sync.)
 @wrap_model_call
-def trace_model(
+async def trace_model(
     request: ModelRequest,
-    handler: Callable[[ModelRequest], ModelResponse],
+    handler: Callable[[ModelRequest], Awaitable[ModelResponse]],
 ) -> ModelResponse:
     print("[wrap_model_call] -> calling the model")
-    response = handler(request)
+    response = await handler(request)
     print("[wrap_model_call] <- model returned")
     return response
 
 
 # Studio supplies its own checkpointer, so none is passed here.
 graph = create_agent(
-    model="gpt-5-nano",
+    model="groq:openai/gpt-oss-20b",
     tools=[web_search, sql_query],
     middleware=[
         log_before_agent,

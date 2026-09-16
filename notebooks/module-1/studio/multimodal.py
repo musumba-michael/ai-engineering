@@ -9,7 +9,7 @@ Send a message whose content is a list of blocks, e.g.
 from langchain.agents import create_agent
 
 graph = create_agent(
-    model="gpt-5-nano",
+    model="groq:qwen/qwen3.8-27b",
     system_prompt=(
         "You are a science fiction writer. Create a capital city at the user's request, "
         "and describe any image you are given as if it were that city."

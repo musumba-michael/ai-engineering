@@ -24,7 +24,7 @@ class CapitalInfo(BaseModel):
 
 
 graph = create_agent(
-    model="gpt-5-nano",
+    model="groq:openai/gpt-oss-20b",
     system_prompt=SYSTEM_PROMPT,
     response_format=CapitalInfo,
 )

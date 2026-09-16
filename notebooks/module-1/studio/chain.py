@@ -1,6 +1,6 @@
 """01-chain.ipynb — a model with a bound tool, one node, no tool execution."""
 
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.graph import END, START, MessagesState, StateGraph
 
 
@@ -14,7 +14,7 @@ def multiply(a: int, b: int) -> int:
     return a * b
 
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatGroq(model="openai/gpt-oss-20b")
 llm_with_tools = llm.bind_tools([multiply])
 
 
